@@ -14,6 +14,7 @@ import UpdatePassword from "./pages/UpdatePassword";
 import Galleries from "./pages/Galleries";
 import GalleryDetail from "./pages/GalleryDetail";
 import ReviewerSignup from "./pages/ReviewerSignup";
+import CreateTestUser from "./pages/CreateTestUser";
 import MySelections from "./pages/MySelections";
 import NotFound from "./pages/NotFound";
 
@@ -39,7 +40,9 @@ const App = () => {
               <Route path="/login" element={<Login />} />
               <Route path="/reset-password" element={<ResetPassword />} />
               <Route path="/update-password" element={<UpdatePassword />} />
+              <Route path="/signup/:token" element={<ReviewerSignup />} />
               <Route path="/invite/:token" element={<ReviewerSignup />} />
+              <Route path="/create-test-user" element={<CreateTestUser />} />
               <Route
                 path="/dashboard"
                 element={
