@@ -45,9 +45,6 @@ const Galleries = () => {
           <div className="mb-8 flex items-center justify-between">
             <div>
               <h1 className="text-4xl font-bold">Galleries</h1>
-              <p className="mt-2 text-muted-foreground">
-                {isOwner ? 'Create your first gallery to get started' : 'No galleries available yet'}
-              </p>
             </div>
             {isOwner && (
               <Button onClick={() => setCreateDialogOpen(true)}>
@@ -61,11 +58,6 @@ const Galleries = () => {
             <div className="text-center">
               <FolderOpen className="h-16 w-16 mx-auto mb-4 text-muted-foreground" />
               <h3 className="text-lg font-semibold">No galleries yet</h3>
-              <p className="mt-2 text-sm text-muted-foreground max-w-md mx-auto">
-                {isOwner
-                  ? 'Create your first gallery to start organizing your photos'
-                  : 'Contact the photographer for access to galleries'}
-              </p>
               {isOwner && (
                 <Button onClick={() => setCreateDialogOpen(true)} className="mt-4">
                   <Plus className="mr-2 h-4 w-4" />
@@ -93,14 +85,6 @@ const Galleries = () => {
         <div className="mb-8 flex items-center justify-between">
           <div>
             <h1 className="text-4xl font-bold">Galleries</h1>
-            <p className="mt-2 text-muted-foreground">
-              {isOwner
-                ? 'Manage and organize your photo galleries'
-                : 'Browse your assigned galleries'}
-            </p>
-            <p className="mt-1 text-sm text-muted-foreground">
-              {rootGalleries.length} galler{rootGalleries.length !== 1 ? 'ies' : 'y'}
-            </p>
           </div>
           {isOwner && (
             <Button onClick={() => setCreateDialogOpen(true)}>
