@@ -14,6 +14,87 @@ export type Database = {
   }
   public: {
     Tables: {
+      galleries: {
+        Row: {
+          created_at: string
+          description: string | null
+          id: string
+          name: string
+          owner_id: string
+          parent_gallery_id: string | null
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          description?: string | null
+          id?: string
+          name: string
+          owner_id: string
+          parent_gallery_id?: string | null
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          description?: string | null
+          id?: string
+          name?: string
+          owner_id?: string
+          parent_gallery_id?: string | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "galleries_owner_id_fkey"
+            columns: ["owner_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "galleries_parent_gallery_id_fkey"
+            columns: ["parent_gallery_id"]
+            isOneToOne: false
+            referencedRelation: "galleries"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      gallery_access: {
+        Row: {
+          gallery_id: string
+          granted_at: string
+          id: string
+          reviewer_id: string
+        }
+        Insert: {
+          gallery_id: string
+          granted_at?: string
+          id?: string
+          reviewer_id: string
+        }
+        Update: {
+          gallery_id?: string
+          granted_at?: string
+          id?: string
+          reviewer_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "gallery_access_gallery_id_fkey"
+            columns: ["gallery_id"]
+            isOneToOne: false
+            referencedRelation: "galleries"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "gallery_access_reviewer_id_fkey"
+            columns: ["reviewer_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       invitation_tokens: {
         Row: {
           created_at: string
@@ -46,6 +127,47 @@ export type Database = {
           used_at?: string | null
         }
         Relationships: []
+      }
+      photos: {
+        Row: {
+          filename: string
+          gallery_id: string
+          id: string
+          metadata: Json | null
+          storage_path: string
+          thumbnail_url: string
+          upload_order: number | null
+          uploaded_at: string
+        }
+        Insert: {
+          filename: string
+          gallery_id: string
+          id?: string
+          metadata?: Json | null
+          storage_path: string
+          thumbnail_url: string
+          upload_order?: number | null
+          uploaded_at?: string
+        }
+        Update: {
+          filename?: string
+          gallery_id?: string
+          id?: string
+          metadata?: Json | null
+          storage_path?: string
+          thumbnail_url?: string
+          upload_order?: number | null
+          uploaded_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "photos_gallery_id_fkey"
+            columns: ["gallery_id"]
+            isOneToOne: false
+            referencedRelation: "galleries"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       profiles: {
         Row: {
@@ -98,11 +220,19 @@ export type Database = {
         Args: { _user_id: string }
         Returns: Database["public"]["Enums"]["app_role"]
       }
+      has_gallery_access: {
+        Args: { _gallery_id: string; _user_id: string }
+        Returns: boolean
+      }
       has_role: {
         Args: {
           _role: Database["public"]["Enums"]["app_role"]
           _user_id: string
         }
+        Returns: boolean
+      }
+      is_gallery_owner: {
+        Args: { _gallery_id: string; _user_id: string }
         Returns: boolean
       }
     }
