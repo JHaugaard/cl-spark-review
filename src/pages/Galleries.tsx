@@ -1,50 +1,91 @@
 import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import Layout from '@/components/Layout';
 import { useAuth } from '@/contexts/AuthContext';
 import { useGalleries } from '@/hooks/useGalleries';
-import { GalleryTree } from '@/components/gallery/GalleryTree';
+import { GalleryCard } from '@/components/gallery/GalleryCard';
 import { CreateGalleryDialog } from '@/components/gallery/CreateGalleryDialog';
-import { EditGalleryDialog } from '@/components/gallery/EditGalleryDialog';
-import { DeleteGalleryDialog } from '@/components/gallery/DeleteGalleryDialog';
-import { ManageAccessDialog } from '@/components/access/ManageAccessDialog';
-import { InviteReviewerDialog } from '@/components/invitation/InviteReviewerDialog';
 import { Button } from '@/components/ui/button';
-import { FolderPlus, UserPlus } from 'lucide-react';
-import { GalleryWithDetails } from '@/lib/gallery-types';
+import { Plus, FolderOpen } from 'lucide-react';
 import { Skeleton } from '@/components/ui/skeleton';
 
 const Galleries = () => {
+  const navigate = useNavigate();
   const { role } = useAuth();
   const { data: galleries, isLoading } = useGalleries();
   const [createDialogOpen, setCreateDialogOpen] = useState(false);
-  const [editDialogOpen, setEditDialogOpen] = useState(false);
-  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
-  const [accessDialogOpen, setAccessDialogOpen] = useState(false);
-  const [inviteDialogOpen, setInviteDialogOpen] = useState(false);
-  const [selectedGallery, setSelectedGallery] = useState<GalleryWithDetails | null>(null);
-  const [parentGalleryId, setParentGalleryId] = useState<string | null>(null);
 
   const isOwner = role === 'owner';
 
-  const handleEdit = (gallery: GalleryWithDetails) => {
-    setSelectedGallery(gallery);
-    setEditDialogOpen(true);
-  };
+  // Filter to show only root galleries (no parent)
+  const rootGalleries = galleries?.filter((g) => !g.parent_gallery_id) || [];
 
-  const handleDelete = (gallery: GalleryWithDetails) => {
-    setSelectedGallery(gallery);
-    setDeleteDialogOpen(true);
-  };
+  if (isLoading) {
+    return (
+      <Layout>
+        <div className="container mx-auto max-w-7xl py-8">
+          <div className="mb-8">
+            <Skeleton className="h-10 w-48 mb-2" />
+            <Skeleton className="h-4 w-64" />
+          </div>
+          <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+            {[...Array(6)].map((_, i) => (
+              <Skeleton key={i} className="h-64 rounded-lg" />
+            ))}
+          </div>
+        </div>
+      </Layout>
+    );
+  }
 
-  const handleCreateSubGallery = (parentId: string) => {
-    setParentGalleryId(parentId);
-    setCreateDialogOpen(true);
-  };
+  if (!rootGalleries || rootGalleries.length === 0) {
+    return (
+      <Layout>
+        <div className="container mx-auto max-w-7xl py-8">
+          <div className="mb-8 flex items-center justify-between">
+            <div>
+              <h1 className="text-4xl font-bold">Galleries</h1>
+              <p className="mt-2 text-muted-foreground">
+                {isOwner ? 'Create your first gallery to get started' : 'No galleries available yet'}
+              </p>
+            </div>
+            {isOwner && (
+              <Button onClick={() => setCreateDialogOpen(true)}>
+                <Plus className="mr-2 h-4 w-4" />
+                Create Gallery
+              </Button>
+            )}
+          </div>
 
-  const handleManageAccess = (gallery: GalleryWithDetails) => {
-    setSelectedGallery(gallery);
-    setAccessDialogOpen(true);
-  };
+          <div className="flex min-h-[400px] items-center justify-center rounded-lg border border-dashed">
+            <div className="text-center">
+              <FolderOpen className="h-16 w-16 mx-auto mb-4 text-muted-foreground" />
+              <h3 className="text-lg font-semibold">No galleries yet</h3>
+              <p className="mt-2 text-sm text-muted-foreground max-w-md mx-auto">
+                {isOwner
+                  ? 'Create your first gallery to start organizing your photos'
+                  : 'Contact the photographer for access to galleries'}
+              </p>
+              {isOwner && (
+                <Button onClick={() => setCreateDialogOpen(true)} className="mt-4">
+                  <Plus className="mr-2 h-4 w-4" />
+                  Create Gallery
+                </Button>
+              )}
+            </div>
+          </div>
+
+          {isOwner && (
+            <CreateGalleryDialog 
+              open={createDialogOpen} 
+              onOpenChange={setCreateDialogOpen}
+              galleries={galleries || []}
+            />
+          )}
+        </div>
+      </Layout>
+    );
+  }
 
   return (
     <Layout>
@@ -53,71 +94,38 @@ const Galleries = () => {
           <div>
             <h1 className="text-4xl font-bold">Galleries</h1>
             <p className="mt-2 text-muted-foreground">
-              {isOwner ? 'Manage your photo galleries' : 'View your assigned galleries'}
+              {isOwner
+                ? 'Manage and organize your photo galleries'
+                : 'Browse your assigned galleries'}
+            </p>
+            <p className="mt-1 text-sm text-muted-foreground">
+              {rootGalleries.length} galler{rootGalleries.length !== 1 ? 'ies' : 'y'}
             </p>
           </div>
           {isOwner && (
-            <div className="flex gap-2">
-              <Button onClick={() => setInviteDialogOpen(true)}>
-                <UserPlus className="mr-2 h-4 w-4" />
-                Invite Reviewer
-              </Button>
-              <Button onClick={() => {
-                setParentGalleryId(null);
-                setCreateDialogOpen(true);
-              }}>
-                <FolderPlus className="mr-2 h-4 w-4" />
-                Create Gallery
-              </Button>
-            </div>
+            <Button onClick={() => setCreateDialogOpen(true)}>
+              <Plus className="mr-2 h-4 w-4" />
+              Create Gallery
+            </Button>
           )}
         </div>
 
-        {isLoading ? (
-          <div className="space-y-4">
-            {[...Array(3)].map((_, i) => (
-              <Skeleton key={i} className="h-48 w-full" />
-            ))}
-          </div>
-        ) : (
-          <GalleryTree
-            galleries={galleries || []}
-            onEdit={handleEdit}
-            onDelete={handleDelete}
-            onCreateSubGallery={handleCreateSubGallery}
-            onManageAccess={handleManageAccess}
-          />
-        )}
+        <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+          {rootGalleries.map((gallery) => (
+            <GalleryCard
+              key={gallery.id}
+              gallery={gallery}
+              onNavigate={(id) => navigate(`/galleries/${id}`)}
+            />
+          ))}
+        </div>
 
         {isOwner && (
-          <>
-            <CreateGalleryDialog
-              open={createDialogOpen}
-              onOpenChange={setCreateDialogOpen}
-              parentGalleryId={parentGalleryId}
-              galleries={galleries || []}
-            />
-            <EditGalleryDialog
-              open={editDialogOpen}
-              onOpenChange={setEditDialogOpen}
-              gallery={selectedGallery}
-              galleries={galleries || []}
-            />
-            <DeleteGalleryDialog
-              open={deleteDialogOpen}
-              onOpenChange={setDeleteDialogOpen}
-              gallery={selectedGallery}
-            />
-            <ManageAccessDialog
-              open={accessDialogOpen}
-              onOpenChange={setAccessDialogOpen}
-              gallery={selectedGallery}
-            />
-            <InviteReviewerDialog
-              open={inviteDialogOpen}
-              onOpenChange={setInviteDialogOpen}
-            />
-          </>
+          <CreateGalleryDialog 
+            open={createDialogOpen} 
+            onOpenChange={setCreateDialogOpen}
+            galleries={galleries || []}
+          />
         )}
       </div>
     </Layout>

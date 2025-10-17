@@ -1,97 +1,154 @@
+import { useEffect, useState } from 'react';
 import { GalleryWithDetails } from '@/lib/gallery-types';
-import { Card, CardHeader, CardTitle, CardDescription, CardContent, CardFooter } from '@/components/ui/card';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { FolderOpen, Image, FolderPlus, Edit, Trash2, Users } from 'lucide-react';
-import { useNavigate } from 'react-router-dom';
+import { FolderOpen, Trash2, Edit, Image, Users } from 'lucide-react';
+import { useAuth } from '@/contexts/AuthContext';
+import { EditGalleryDialog } from './EditGalleryDialog';
+import { DeleteGalleryDialog } from './DeleteGalleryDialog';
+import { ManageAccessDialog } from '@/components/access/ManageAccessDialog';
+import { Badge } from '@/components/ui/badge';
+import { supabase } from '@/integrations/supabase/client';
+import { Skeleton } from '@/components/ui/skeleton';
 
 interface GalleryCardProps {
   gallery: GalleryWithDetails;
-  onEdit: (gallery: GalleryWithDetails) => void;
-  onDelete: (gallery: GalleryWithDetails) => void;
-  onCreateSubGallery: (parentId: string) => void;
-  onManageAccess: (gallery: GalleryWithDetails) => void;
+  onNavigate: (galleryId: string) => void;
 }
 
-export const GalleryCard = ({
-  gallery,
-  onEdit,
-  onDelete,
-  onCreateSubGallery,
-  onManageAccess,
-}: GalleryCardProps) => {
-  const navigate = useNavigate();
+export const GalleryCard = ({ gallery, onNavigate }: GalleryCardProps) => {
+  const { role } = useAuth();
+  const [editOpen, setEditOpen] = useState(false);
+  const [deleteOpen, setDeleteOpen] = useState(false);
+  const [accessOpen, setAccessOpen] = useState(false);
+  const [previewUrl, setPreviewUrl] = useState<string | null>(null);
+  const [isLoadingPreview, setIsLoadingPreview] = useState(true);
+
+  const isOwner = role === 'owner';
+
+  useEffect(() => {
+    const fetchPreviewImage = async () => {
+      try {
+        const { data: photos } = await supabase
+          .from('photos')
+          .select('thumbnail_url')
+          .eq('gallery_id', gallery.id)
+          .order('upload_order', { ascending: true })
+          .limit(1);
+
+        if (photos && photos.length > 0) {
+          setPreviewUrl(photos[0].thumbnail_url);
+        }
+      } catch (error) {
+        console.error('Error fetching preview:', error);
+      } finally {
+        setIsLoadingPreview(false);
+      }
+    };
+
+    fetchPreviewImage();
+  }, [gallery.id]);
 
   return (
-    <Card className="transition-all hover:shadow-md">
-      <CardHeader>
-        <div className="flex items-start justify-between">
-          <div className="flex items-center gap-2">
-            <FolderOpen className="h-5 w-5 text-primary" />
-            <CardTitle className="text-lg">{gallery.name}</CardTitle>
-          </div>
-        </div>
-        {gallery.description && (
-          <CardDescription className="line-clamp-2">{gallery.description}</CardDescription>
-        )}
-      </CardHeader>
-      
-      <CardContent>
-        <div className="flex gap-4 text-sm text-muted-foreground">
-          <div className="flex items-center gap-1">
-            <Image className="h-4 w-4" />
-            <span>{gallery.photo_count || 0} photos</span>
-          </div>
-          {(gallery.subgallery_count || 0) > 0 && (
-            <div className="flex items-center gap-1">
-              <FolderOpen className="h-4 w-4" />
-              <span>{gallery.subgallery_count} sub-galleries</span>
+    <>
+      <Card className="hover:shadow-md transition-shadow overflow-hidden group">
+        {/* Preview Image */}
+        <div 
+          className="aspect-video bg-muted relative cursor-pointer overflow-hidden"
+          onClick={() => onNavigate(gallery.id)}
+        >
+          {isLoadingPreview ? (
+            <Skeleton className="w-full h-full" />
+          ) : previewUrl ? (
+            <img
+              src={previewUrl}
+              alt={gallery.name}
+              className="w-full h-full object-cover transition-transform duration-200 group-hover:scale-105"
+            />
+          ) : (
+            <div className="w-full h-full flex items-center justify-center">
+              <FolderOpen className="h-12 w-12 text-muted-foreground" />
             </div>
           )}
         </div>
-      </CardContent>
 
-      <CardFooter className="flex flex-wrap gap-2">
-        <Button
-          size="sm"
-          variant="default"
-          onClick={() => navigate(`/galleries/${gallery.id}`)}
-        >
-          <Image className="mr-2 h-4 w-4" />
-          View Photos
-        </Button>
-        <Button
-          size="sm"
-          variant="outline"
-          onClick={() => onCreateSubGallery(gallery.id)}
-        >
-          <FolderPlus className="mr-2 h-4 w-4" />
-          Sub-Gallery
-        </Button>
-        <Button
-          size="sm"
-          variant="outline"
-          onClick={() => onEdit(gallery)}
-        >
-          <Edit className="mr-2 h-4 w-4" />
-          Edit
-        </Button>
-        <Button
-          size="sm"
-          variant="outline"
-          onClick={() => onManageAccess(gallery)}
-        >
-          <Users className="mr-2 h-4 w-4" />
-          Access
-        </Button>
-        <Button
-          size="sm"
-          variant="destructive"
-          onClick={() => onDelete(gallery)}
-        >
-          <Trash2 className="mr-2 h-4 w-4" />
-          Delete
-        </Button>
-      </CardFooter>
-    </Card>
+        <CardHeader onClick={() => onNavigate(gallery.id)} className="cursor-pointer">
+          <div className="flex items-start justify-between">
+            <div className="flex-1">
+              <CardTitle className="flex items-center gap-2">
+                {gallery.name}
+              </CardTitle>
+              {gallery.description && (
+                <CardDescription className="mt-2 line-clamp-2">{gallery.description}</CardDescription>
+              )}
+            </div>
+          </div>
+        </CardHeader>
+        <CardContent>
+          <div className="flex items-center gap-4 text-sm text-muted-foreground flex-wrap">
+            <Badge variant="secondary" className="flex items-center gap-1">
+              <Image className="h-3 w-3" />
+              <span>{gallery.photo_count || 0}</span>
+            </Badge>
+            {gallery.subgallery_count !== undefined && gallery.subgallery_count > 0 && (
+              <Badge variant="secondary" className="flex items-center gap-1">
+                <FolderOpen className="h-3 w-3" />
+                <span>{gallery.subgallery_count}</span>
+              </Badge>
+            )}
+          </div>
+          
+          {isOwner && (
+            <div className="flex gap-2 mt-4" onClick={(e) => e.stopPropagation()}>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => setEditOpen(true)}
+              >
+                <Edit className="h-4 w-4 mr-1" />
+                Edit
+              </Button>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => setAccessOpen(true)}
+              >
+                <Users className="h-4 w-4 mr-1" />
+                Access
+              </Button>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => setDeleteOpen(true)}
+              >
+                <Trash2 className="h-4 w-4 mr-1" />
+                Delete
+              </Button>
+            </div>
+          )}
+        </CardContent>
+      </Card>
+
+      {isOwner && (
+        <>
+          <EditGalleryDialog
+            open={editOpen}
+            onOpenChange={setEditOpen}
+            gallery={gallery}
+            galleries={[]}
+          />
+          <DeleteGalleryDialog
+            open={deleteOpen}
+            onOpenChange={setDeleteOpen}
+            gallery={gallery}
+          />
+          <ManageAccessDialog
+            open={accessOpen}
+            onOpenChange={setAccessOpen}
+            gallery={gallery}
+          />
+        </>
+      )}
+    </>
   );
 };

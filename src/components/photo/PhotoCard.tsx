@@ -1,8 +1,9 @@
-import { useState } from 'react';
+import { useEffect, useRef } from 'react';
 import { Photo } from '@/lib/gallery-types';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Trash2 } from 'lucide-react';
+import { Skeleton } from '@/components/ui/skeleton';
 import {
   AlertDialog,
   AlertDialogAction,
@@ -12,75 +13,93 @@ import {
   AlertDialogFooter,
   AlertDialogHeader,
   AlertDialogTitle,
+  AlertDialogTrigger,
 } from '@/components/ui/alert-dialog';
-import { formatFileSize } from '@/lib/photo-utils';
 
 interface PhotoCardProps {
   photo: Photo;
-  onDelete: (photo: Photo) => void;
+  index: number;
+  isVisible: boolean;
+  onPhotoClick: () => void;
+  onDelete?: (photo: Photo) => void;
+  observerRef: React.MutableRefObject<IntersectionObserver | null>;
 }
 
-export const PhotoCard = ({ photo, onDelete }: PhotoCardProps) => {
-  const [showDeleteDialog, setShowDeleteDialog] = useState(false);
-  const [imageLoaded, setImageLoaded] = useState(false);
+export const PhotoCard = ({ 
+  photo, 
+  index, 
+  isVisible, 
+  onPhotoClick, 
+  onDelete,
+  observerRef 
+}: PhotoCardProps) => {
+  const cardRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const element = cardRef.current;
+    if (element && observerRef.current) {
+      observerRef.current.observe(element);
+    }
+
+    return () => {
+      if (element && observerRef.current) {
+        observerRef.current.unobserve(element);
+      }
+    };
+  }, [observerRef]);
 
   return (
-    <>
-      <Card className="group relative overflow-hidden transition-all hover:scale-[1.02] hover:shadow-lg">
-        <div className="aspect-square">
-          {!imageLoaded && (
-            <div className="absolute inset-0 animate-pulse bg-muted" />
-          )}
+    <Card 
+      ref={cardRef}
+      data-index={index}
+      className="overflow-hidden group relative cursor-pointer transition-all duration-200 hover:scale-[1.02] hover:shadow-lg"
+    >
+      <div className="aspect-square relative bg-muted">
+        {isVisible ? (
           <img
             src={photo.thumbnail_url}
             alt={photo.filename}
-            className="h-full w-full object-cover"
+            className="w-full h-full object-cover"
+            onClick={onPhotoClick}
             loading="lazy"
-            onLoad={() => setImageLoaded(true)}
           />
-        </div>
-        
-        <div className="absolute inset-0 bg-black/60 opacity-0 transition-opacity group-hover:opacity-100">
-          <div className="flex h-full flex-col justify-between p-3">
-            <div className="text-xs text-white">
-              <p className="truncate font-medium">{photo.filename}</p>
-              {photo.metadata?.size && (
-                <p className="text-white/80">{formatFileSize(photo.metadata.size)}</p>
-              )}
-            </div>
-            
-            <div className="flex justify-end">
+        ) : (
+          <Skeleton className="w-full h-full" />
+        )}
+        {onDelete && (
+          <AlertDialog>
+            <AlertDialogTrigger asChild>
               <Button
-                size="sm"
                 variant="destructive"
-                onClick={() => setShowDeleteDialog(true)}
+                size="icon"
+                className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity"
+                onClick={(e) => e.stopPropagation()}
               >
                 <Trash2 className="h-4 w-4" />
               </Button>
-            </div>
-          </div>
-        </div>
-      </Card>
-
-      <AlertDialog open={showDeleteDialog} onOpenChange={setShowDeleteDialog}>
-        <AlertDialogContent>
-          <AlertDialogHeader>
-            <AlertDialogTitle>Delete Photo</AlertDialogTitle>
-            <AlertDialogDescription>
-              Are you sure you want to delete this photo? This action cannot be undone.
-            </AlertDialogDescription>
-          </AlertDialogHeader>
-          <AlertDialogFooter>
-            <AlertDialogCancel>Cancel</AlertDialogCancel>
-            <AlertDialogAction
-              onClick={() => onDelete(photo)}
-              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
-            >
-              Delete Photo
-            </AlertDialogAction>
-          </AlertDialogFooter>
-        </AlertDialogContent>
-      </AlertDialog>
-    </>
+            </AlertDialogTrigger>
+            <AlertDialogContent>
+              <AlertDialogHeader>
+                <AlertDialogTitle>Delete Photo</AlertDialogTitle>
+                <AlertDialogDescription>
+                  Are you sure you want to delete this photo? This action cannot be undone.
+                </AlertDialogDescription>
+              </AlertDialogHeader>
+              <AlertDialogFooter>
+                <AlertDialogCancel>Cancel</AlertDialogCancel>
+                <AlertDialogAction onClick={() => onDelete(photo)}>
+                  Delete
+                </AlertDialogAction>
+              </AlertDialogFooter>
+            </AlertDialogContent>
+          </AlertDialog>
+        )}
+      </div>
+      <div className="p-3">
+        <p className="text-sm text-muted-foreground truncate">
+          {photo.filename}
+        </p>
+      </div>
+    </Card>
   );
 };
