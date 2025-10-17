@@ -1,8 +1,9 @@
+import { lazy, Suspense } from "react";
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
+import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { AuthProvider } from "@/contexts/AuthContext";
 import { ProtectedRoute } from "@/components/ProtectedRoute";
 import { OwnerRoute } from "@/components/OwnerRoute";
@@ -14,12 +15,14 @@ import Galleries from "./pages/Galleries";
 import GalleryDetail from "./pages/GalleryDetail";
 import ReviewerSignup from "./pages/ReviewerSignup";
 import MySelections from "./pages/MySelections";
-import Dashboard from "./pages/Dashboard";
-import DashboardSelections from "./pages/DashboardSelections";
-import DashboardReviewers from "./pages/DashboardReviewers";
-import DashboardAnalytics from "./pages/DashboardAnalytics";
-import ReviewerDetail from "./pages/ReviewerDetail";
 import NotFound from "./pages/NotFound";
+
+// Lazy load dashboard pages (owner-only routes)
+const Dashboard = lazy(() => import("./pages/Dashboard"));
+const DashboardSelections = lazy(() => import("./pages/DashboardSelections"));
+const DashboardReviewers = lazy(() => import("./pages/DashboardReviewers"));
+const DashboardAnalytics = lazy(() => import("./pages/DashboardAnalytics"));
+const ReviewerDetail = lazy(() => import("./pages/ReviewerDetail"));
 
 const queryClient = new QueryClient();
 
@@ -40,7 +43,9 @@ const App = () => (
               path="/dashboard"
               element={
                 <OwnerRoute>
-                  <Dashboard />
+                  <Suspense fallback={<div className="flex min-h-screen items-center justify-center">Loading...</div>}>
+                    <Dashboard />
+                  </Suspense>
                 </OwnerRoute>
               }
             />
@@ -48,7 +53,9 @@ const App = () => (
               path="/dashboard/selections"
               element={
                 <OwnerRoute>
-                  <DashboardSelections />
+                  <Suspense fallback={<div className="flex min-h-screen items-center justify-center">Loading...</div>}>
+                    <DashboardSelections />
+                  </Suspense>
                 </OwnerRoute>
               }
             />
@@ -56,7 +63,9 @@ const App = () => (
               path="/dashboard/reviewers"
               element={
                 <OwnerRoute>
-                  <DashboardReviewers />
+                  <Suspense fallback={<div className="flex min-h-screen items-center justify-center">Loading...</div>}>
+                    <DashboardReviewers />
+                  </Suspense>
                 </OwnerRoute>
               }
             />
@@ -64,7 +73,9 @@ const App = () => (
               path="/dashboard/reviewers/:id"
               element={
                 <OwnerRoute>
-                  <ReviewerDetail />
+                  <Suspense fallback={<div className="flex min-h-screen items-center justify-center">Loading...</div>}>
+                    <ReviewerDetail />
+                  </Suspense>
                 </OwnerRoute>
               }
             />
@@ -72,7 +83,9 @@ const App = () => (
               path="/dashboard/analytics"
               element={
                 <OwnerRoute>
-                  <DashboardAnalytics />
+                  <Suspense fallback={<div className="flex min-h-screen items-center justify-center">Loading...</div>}>
+                    <DashboardAnalytics />
+                  </Suspense>
                 </OwnerRoute>
               }
             />
