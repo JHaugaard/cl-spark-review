@@ -12,7 +12,7 @@ const Index = () => {
         navigate('/login');
       } else if (role === 'owner') {
         navigate('/dashboard');
-      } else if (role === 'reviewer') {
+      } else if (role === 'guest') {
         navigate('/galleries');
       }
     }

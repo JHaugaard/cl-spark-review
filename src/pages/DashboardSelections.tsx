@@ -2,7 +2,7 @@ import { useState } from 'react';
 import Layout from '@/components/Layout';
 import { useAllSelections } from '@/hooks/useAllSelections';
 import { useGalleries } from '@/hooks/useGalleries';
-import { useReviewerManagement } from '@/hooks/useReviewerManagement';
+import { useGuestManagement } from '@/hooks/useGuestManagement';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
@@ -14,11 +14,11 @@ import { format } from 'date-fns';
 const DashboardSelections = () => {
   const { data: selections, isLoading } = useAllSelections();
   const { data: galleries } = useGalleries();
-  const { data: reviewers } = useReviewerManagement();
+  const { data: guests } = useGuestManagement();
 
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedGallery, setSelectedGallery] = useState<string>('all');
-  const [selectedReviewer, setSelectedReviewer] = useState<string>('all');
+  const [selectedGuest, setSelectedGuest] = useState<string>('all');
 
   // Filter selections based on criteria
   const filteredSelections = selections?.filter((selection: any) => {
@@ -30,10 +30,10 @@ const DashboardSelections = () => {
     const matchesGallery = selectedGallery === 'all' || 
       selection.photos?.galleries?.id === selectedGallery;
 
-    const matchesReviewer = selectedReviewer === 'all' || 
-      selection.reviewer_id === selectedReviewer;
+    const matchesGuest = selectedGuest === 'all' || 
+      selection.reviewer_id === selectedGuest;
 
-    return matchesSearch && matchesGallery && matchesReviewer;
+    return matchesSearch && matchesGallery && matchesGuest;
   }) || [];
 
   const handleExport = () => {
@@ -67,7 +67,7 @@ const DashboardSelections = () => {
           <div className="relative">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
             <Input
-              placeholder="Search photos, reviewers, notes..."
+              placeholder="Search photos, guests, notes..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
               className="pl-10"
@@ -88,15 +88,15 @@ const DashboardSelections = () => {
             </SelectContent>
           </Select>
 
-          <Select value={selectedReviewer} onValueChange={setSelectedReviewer}>
+          <Select value={selectedGuest} onValueChange={setSelectedGuest}>
             <SelectTrigger>
-              <SelectValue placeholder="Filter by reviewer" />
+              <SelectValue placeholder="Filter by guest" />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="all">All Reviewers</SelectItem>
-              {reviewers?.map((reviewer) => (
-                <SelectItem key={reviewer.id} value={reviewer.id}>
-                  {reviewer.full_name || reviewer.email}
+              <SelectItem value="all">All Guests</SelectItem>
+              {guests?.map((guest) => (
+                <SelectItem key={guest.id} value={guest.id}>
+                  {guest.full_name || guest.email}
                 </SelectItem>
               ))}
             </SelectContent>
@@ -110,7 +110,7 @@ const DashboardSelections = () => {
               <TableRow>
                 <TableHead>Photo</TableHead>
                 <TableHead>Gallery</TableHead>
-                <TableHead>Reviewer</TableHead>
+                <TableHead>Guest</TableHead>
                 <TableHead>Selected At</TableHead>
                 <TableHead>Notes</TableHead>
               </TableRow>

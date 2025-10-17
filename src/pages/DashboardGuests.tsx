@@ -1,26 +1,26 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Layout from '@/components/Layout';
-import { useReviewerManagement, useRemoveReviewer } from '@/hooks/useReviewerManagement';
+import { useGuestManagement, useRemoveGuest } from '@/hooks/useGuestManagement';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Badge } from '@/components/ui/badge';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from '@/components/ui/alert-dialog';
-import { InviteReviewerDialog } from '@/components/invitation/InviteReviewerDialog';
+import { InviteGuestDialog } from '@/components/invitation/InviteGuestDialog';
 import { Search, UserPlus, Trash2, Eye } from 'lucide-react';
 import { format } from 'date-fns';
 
-const DashboardReviewers = () => {
+const DashboardGuests = () => {
   const navigate = useNavigate();
-  const { data: reviewers, isLoading } = useReviewerManagement();
-  const removeReviewer = useRemoveReviewer();
+  const { data: guests, isLoading } = useGuestManagement();
+  const removeGuest = useRemoveGuest();
   const [searchTerm, setSearchTerm] = useState('');
   const [inviteDialogOpen, setInviteDialogOpen] = useState(false);
 
-  const filteredReviewers = reviewers?.filter((reviewer) =>
-    reviewer.full_name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    reviewer.email.toLowerCase().includes(searchTerm.toLowerCase())
+  const filteredGuests = guests?.filter((guest) =>
+    guest.full_name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    guest.email.toLowerCase().includes(searchTerm.toLowerCase())
   ) || [];
 
   return (
@@ -29,14 +29,14 @@ const DashboardReviewers = () => {
         {/* Header */}
         <div className="mb-8 flex items-center justify-between">
           <div>
-            <h1 className="text-4xl font-bold">Reviewer Management</h1>
+            <h1 className="text-4xl font-bold">Guest Management</h1>
             <p className="mt-2 text-muted-foreground">
-              {filteredReviewers.length} reviewer{filteredReviewers.length !== 1 ? 's' : ''}
+              {filteredGuests.length} guest{filteredGuests.length !== 1 ? 's' : ''}
             </p>
           </div>
           <Button onClick={() => setInviteDialogOpen(true)}>
             <UserPlus className="mr-2 h-4 w-4" />
-            Invite Reviewer
+            Invite Guest
           </Button>
         </div>
 
@@ -73,34 +73,34 @@ const DashboardReviewers = () => {
                     Loading...
                   </TableCell>
                 </TableRow>
-              ) : filteredReviewers.length === 0 ? (
+              ) : filteredGuests.length === 0 ? (
                 <TableRow>
                   <TableCell colSpan={6} className="text-center py-8 text-muted-foreground">
-                    No reviewers found
+                    No guests found
                   </TableCell>
                 </TableRow>
               ) : (
-                filteredReviewers.map((reviewer) => (
-                  <TableRow key={reviewer.id} className="hover:bg-muted/50">
+                filteredGuests.map((guest) => (
+                  <TableRow key={guest.id} className="hover:bg-muted/50">
                     <TableCell className="font-medium">
-                      {reviewer.full_name || 'No name'}
+                      {guest.full_name || 'No name'}
                     </TableCell>
-                    <TableCell>{reviewer.email}</TableCell>
+                    <TableCell>{guest.email}</TableCell>
                     <TableCell>
-                      <Badge variant="secondary">{reviewer.gallery_count}</Badge>
+                      <Badge variant="secondary">{guest.gallery_count}</Badge>
                     </TableCell>
                     <TableCell>
-                      <Badge variant="outline">{reviewer.selection_count}</Badge>
+                      <Badge variant="outline">{guest.selection_count}</Badge>
                     </TableCell>
                     <TableCell className="text-sm text-muted-foreground">
-                      {format(new Date(reviewer.created_at), 'MMM dd, yyyy')}
+                      {format(new Date(guest.created_at), 'MMM dd, yyyy')}
                     </TableCell>
                     <TableCell className="text-right">
                       <div className="flex justify-end gap-2">
                         <Button
                           variant="ghost"
                           size="sm"
-                          onClick={() => navigate(`/dashboard/reviewers/${reviewer.id}`)}
+                          onClick={() => navigate(`/dashboard/guests/${guest.id}`)}
                         >
                           <Eye className="h-4 w-4" />
                         </Button>
@@ -112,16 +112,16 @@ const DashboardReviewers = () => {
                           </AlertDialogTrigger>
                           <AlertDialogContent>
                             <AlertDialogHeader>
-                              <AlertDialogTitle>Remove reviewer?</AlertDialogTitle>
+                              <AlertDialogTitle>Remove guest?</AlertDialogTitle>
                               <AlertDialogDescription>
-                                This will remove {reviewer.full_name || reviewer.email}'s access to all galleries. 
+                                This will remove {guest.full_name || guest.email}'s access to all galleries. 
                                 This action cannot be undone.
                               </AlertDialogDescription>
                             </AlertDialogHeader>
                             <AlertDialogFooter>
                               <AlertDialogCancel>Cancel</AlertDialogCancel>
                               <AlertDialogAction
-                                onClick={() => removeReviewer.mutate(reviewer.id)}
+                                onClick={() => removeGuest.mutate(guest.id)}
                                 className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
                               >
                                 Remove
@@ -138,7 +138,7 @@ const DashboardReviewers = () => {
           </Table>
         </div>
 
-        <InviteReviewerDialog 
+        <InviteGuestDialog 
           open={inviteDialogOpen}
           onOpenChange={setInviteDialogOpen}
         />
@@ -147,4 +147,4 @@ const DashboardReviewers = () => {
   );
 };
 
-export default DashboardReviewers;
+export default DashboardGuests;

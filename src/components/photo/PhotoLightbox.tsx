@@ -28,7 +28,7 @@ export const PhotoLightbox = ({
   const { role } = useAuth();
   const { data: selections } = useGallerySelections(galleryId);
   const toggleSelection = useToggleSelection();
-  const isReviewer = role === 'reviewer';
+  const isGuest = role === 'guest';
 
   const slides = photos.map((photo) => ({
     src: photo.thumbnail_url,
@@ -77,7 +77,7 @@ export const PhotoLightbox = ({
           break;
         case 's':
         case 'S':
-          if (isReviewer) {
+          if (isGuest) {
             e.preventDefault();
             handleToggleSelection();
           }
@@ -87,7 +87,7 @@ export const PhotoLightbox = ({
 
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [isOpen, handlePrevious, handleNext, onClose, isReviewer, handleToggleSelection]);
+  }, [isOpen, handlePrevious, handleNext, onClose, isGuest, handleToggleSelection]);
 
   if (!isOpen) return null;
 
@@ -114,7 +114,7 @@ export const PhotoLightbox = ({
         }}
       />
       
-      {isReviewer && (
+      {isGuest && (
         <Button
           onClick={handleToggleSelection}
           className="fixed top-6 right-20 z-[9999] bg-background/80 backdrop-blur-sm hover:bg-background/90"

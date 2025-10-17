@@ -28,7 +28,7 @@ export interface GalleryAccess {
   granted_at: string;
 }
 
-export interface Reviewer {
+export interface Guest {
   id: string;
   email: string;
   full_name: string | null;
@@ -57,12 +57,12 @@ export const createGallerySchema = z.object({
 
 export const editGallerySchema = createGallerySchema;
 
-export const inviteReviewerSchema = z.object({
+export const inviteGuestSchema = z.object({
   email: z.string().email('Invalid email address'),
   full_name: z.string().min(1, 'Full name is required').max(100, 'Name must be less than 100 characters'),
 });
 
-export const reviewerSignupSchema = z.object({
+export const guestSignupSchema = z.object({
   password: z.string()
     .min(8, 'Password must be at least 8 characters')
     .regex(/[A-Z]/, 'Password must contain at least one uppercase letter')
@@ -96,5 +96,5 @@ export const photoNotesSchema = z.object({
 });
 
 export type PhotoNotesInput = z.infer<typeof photoNotesSchema>;
-export type InviteReviewerInput = z.infer<typeof inviteReviewerSchema>;
-export type ReviewerSignupInput = z.infer<typeof reviewerSignupSchema>;
+export type InviteGuestInput = z.infer<typeof inviteGuestSchema>;
+export type GuestSignupInput = z.infer<typeof guestSignupSchema>;

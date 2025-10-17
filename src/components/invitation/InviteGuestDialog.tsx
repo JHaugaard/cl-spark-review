@@ -6,33 +6,33 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { inviteReviewerSchema, InviteReviewerInput } from '@/lib/gallery-types';
+import { inviteGuestSchema, InviteGuestInput } from '@/lib/gallery-types';
 import { useCreateInvitation } from '@/hooks/useInvitations';
 import { CopyLinkButton } from './CopyLinkButton';
 import { InvitationsList } from './InvitationsList';
 
-interface InviteReviewerDialogProps {
+interface InviteGuestDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
 }
 
-export const InviteReviewerDialog = ({
+export const InviteGuestDialog = ({
   open,
   onOpenChange,
-}: InviteReviewerDialogProps) => {
+}: InviteGuestDialogProps) => {
   const createInvitation = useCreateInvitation();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [invitationLink, setInvitationLink] = useState<string | null>(null);
 
-  const form = useForm<InviteReviewerInput>({
-    resolver: zodResolver(inviteReviewerSchema),
+  const form = useForm<InviteGuestInput>({
+    resolver: zodResolver(inviteGuestSchema),
     defaultValues: {
       email: '',
       full_name: '',
     },
   });
 
-  const onSubmit = async (data: InviteReviewerInput) => {
+  const onSubmit = async (data: InviteGuestInput) => {
     setIsSubmitting(true);
     try {
       const result = await createInvitation.mutateAsync(data);
@@ -54,9 +54,9 @@ export const InviteReviewerDialog = ({
     <Dialog open={open} onOpenChange={handleClose}>
       <DialogContent className="sm:max-w-[600px]">
         <DialogHeader>
-          <DialogTitle>Invite Reviewer</DialogTitle>
+          <DialogTitle>Invite Guest</DialogTitle>
           <DialogDescription>
-            Create an invitation link for a new reviewer to join
+            Create an invitation link for a new guest to join
           </DialogDescription>
         </DialogHeader>
 
@@ -74,7 +74,7 @@ export const InviteReviewerDialog = ({
                     Invitation created successfully!
                   </p>
                   <p className="mt-2 text-sm text-green-800 dark:text-green-200">
-                    Share this link with the reviewer. It will expire in 7 days.
+                    Share this link with the guest. It will expire in 7 days.
                   </p>
                 </div>
 
@@ -105,7 +105,7 @@ export const InviteReviewerDialog = ({
                         <FormControl>
                           <Input
                             type="email"
-                            placeholder="reviewer@example.com"
+                            placeholder="guest@example.com"
                             {...field}
                           />
                         </FormControl>

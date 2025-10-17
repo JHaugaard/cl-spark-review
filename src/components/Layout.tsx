@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
 import { Button } from '@/components/ui/button';
-import { InviteReviewerDialog } from '@/components/invitation/InviteReviewerDialog';
+import { InviteGuestDialog } from '@/components/invitation/InviteGuestDialog';
 import { FolderOpen, UserPlus, Heart, LayoutDashboard } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import logo from '@/assets/logo.png';
@@ -61,7 +61,7 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
                   Galleries
                 </Button>
                 
-                {role === 'reviewer' && (
+                {role === 'guest' && (
                   <Button
                     variant={location.pathname === '/selections' ? 'default' : 'ghost'}
                     size="sm"
@@ -84,7 +84,7 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
                   onClick={() => setInviteDialogOpen(true)}
                 >
                   <UserPlus className="mr-2 h-4 w-4" />
-                  Invite Reviewer
+                  Invite Guest
                 </Button>
               )}
               
@@ -115,7 +115,7 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
       <main>{children}</main>
       
       {isOwner && (
-        <InviteReviewerDialog
+        <InviteGuestDialog
           open={inviteDialogOpen}
           onOpenChange={setInviteDialogOpen}
         />

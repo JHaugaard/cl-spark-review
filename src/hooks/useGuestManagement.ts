@@ -2,7 +2,7 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 
-export interface ReviewerStats {
+export interface GuestStats {
   id: string;
   email: string;
   full_name: string | null;
@@ -11,25 +11,25 @@ export interface ReviewerStats {
   selection_count: number;
 }
 
-export const useReviewerManagement = () => {
+export const useGuestManagement = () => {
   return useQuery({
-    queryKey: ['reviewers-management'],
+    queryKey: ['guests-management'],
     queryFn: async () => {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) throw new Error('Not authenticated');
 
-      // First get reviewer user IDs
-      const { data: reviewerRoles } = await supabase
+      // First get reviewer user IDs (database still uses 'reviewer' role)
+      const { data: guestRoles } = await supabase
         .from('user_roles')
         .select('user_id')
         .eq('role', 'reviewer');
 
-      const reviewerIds = reviewerRoles?.map(r => r.user_id) || [];
+      const guestIds = guestRoles?.map(r => r.user_id) || [];
 
-      if (reviewerIds.length === 0) return [];
+      if (guestIds.length === 0) return [];
 
-      // Get all reviewer profiles
-      const { data: reviewers, error: reviewersError } = await supabase
+      // Get all guest profiles
+      const { data: guests, error: guestsError } = await supabase
         .from('profiles')
         .select(`
           id,
@@ -37,10 +37,10 @@ export const useReviewerManagement = () => {
           full_name,
           created_at
         `)
-        .in('id', reviewerIds)
+        .in('id', guestIds)
         .order('created_at', { ascending: false });
 
-      if (reviewersError) throw reviewersError;
+      if (guestsError) throw guestsError;
 
       // Get owner's gallery IDs
       const { data: ownedGalleries } = await supabase
@@ -50,15 +50,15 @@ export const useReviewerManagement = () => {
 
       const galleryIds = ownedGalleries?.map(g => g.id) || [];
 
-      // For each reviewer, get their stats
-      const reviewersWithStats = await Promise.all(
-        (reviewers || []).map(async (reviewer) => {
+      // For each guest, get their stats
+      const guestsWithStats = await Promise.all(
+        (guests || []).map(async (guest) => {
           // Get gallery count (only owner's galleries)
           const { count: galleryCount } = galleryIds.length > 0
             ? await supabase
                 .from('gallery_access')
                 .select('gallery_id', { count: 'exact', head: true })
-                .eq('reviewer_id', reviewer.id)
+                .eq('reviewer_id', guest.id)
                 .in('gallery_id', galleryIds)
             : { count: 0 };
 
@@ -76,48 +76,48 @@ export const useReviewerManagement = () => {
               const { count } = await supabase
                 .from('photo_selections')
                 .select('id', { count: 'exact', head: true })
-                .eq('reviewer_id', reviewer.id)
+                .eq('reviewer_id', guest.id)
                 .in('photo_id', photoIds);
               selectionCount = count || 0;
             }
           }
 
           return {
-            id: reviewer.id,
-            email: reviewer.email,
-            full_name: reviewer.full_name,
-            created_at: reviewer.created_at,
+            id: guest.id,
+            email: guest.email,
+            full_name: guest.full_name,
+            created_at: guest.created_at,
             gallery_count: galleryCount || 0,
             selection_count: selectionCount,
           };
         })
       );
 
-      return reviewersWithStats as ReviewerStats[];
+      return guestsWithStats as GuestStats[];
     },
   });
 };
 
-export const useRemoveReviewer = () => {
+export const useRemoveGuest = () => {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: async (reviewerId: string) => {
+    mutationFn: async (guestId: string) => {
       // Delete user role (this prevents login)
       const { error: roleError } = await supabase
         .from('user_roles')
         .delete()
-        .eq('user_id', reviewerId);
+        .eq('user_id', guestId);
 
       if (roleError) throw roleError;
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['reviewers-management'] });
-      queryClient.invalidateQueries({ queryKey: ['reviewers'] });
-      toast.success('Reviewer removed successfully');
+      queryClient.invalidateQueries({ queryKey: ['guests-management'] });
+      queryClient.invalidateQueries({ queryKey: ['guests'] });
+      toast.success('Guest removed successfully');
     },
     onError: (error: any) => {
-      toast.error(error.message || 'Failed to remove reviewer');
+      toast.error(error.message || 'Failed to remove guest');
     },
   });
 };

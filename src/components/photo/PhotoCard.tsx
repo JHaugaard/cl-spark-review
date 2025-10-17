@@ -43,7 +43,7 @@ export const PhotoCard = ({
   const cardRef = useRef<HTMLDivElement>(null);
   const { role } = useAuth();
   const toggleSelection = useToggleSelection();
-  const isReviewer = role === 'reviewer';
+  const isGuest = role === 'guest';
 
   const handleToggleSelection = (e: React.MouseEvent) => {
     e.stopPropagation();
@@ -71,7 +71,7 @@ export const PhotoCard = ({
       data-index={index}
       className={cn(
         "overflow-hidden group relative cursor-pointer transition-all duration-200 hover:scale-[1.02] hover:shadow-lg",
-        isSelected && isReviewer && "ring-2 ring-blue-500"
+        isSelected && isGuest && "ring-2 ring-blue-500"
       )}
     >
       <div className="aspect-square relative bg-muted">
@@ -87,7 +87,7 @@ export const PhotoCard = ({
           <Skeleton className="w-full h-full" />
         )}
 
-        {isReviewer && onToggleSelection && (
+        {isGuest && onToggleSelection && (
           <button
             onClick={handleToggleSelection}
             className="absolute top-2 right-2 z-10 transition-transform hover:scale-110"

@@ -6,7 +6,7 @@ import { AppRole } from '@/lib/supabase-types';
 interface AuthContextType {
   user: User | null;
   session: Session | null;
-  role: AppRole | null;
+  role: 'owner' | 'guest' | null;
   loading: boolean;
   login: (email: string, password: string) => Promise<{ error: Error | null }>;
   logout: () => Promise<void>;
@@ -19,7 +19,7 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [user, setUser] = useState<User | null>(null);
   const [session, setSession] = useState<Session | null>(null);
-  const [role, setRole] = useState<AppRole | null>(null);
+  const [role, setRole] = useState<'owner' | 'guest' | null>(null);
   const [loading, setLoading] = useState(true);
 
   const fetchUserRole = async (userId: string) => {
@@ -29,7 +29,9 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       });
       
       if (error) throw error;
-      setRole(data as AppRole);
+      // Map 'reviewer' to 'guest' for frontend display
+      const mappedRole = data === 'reviewer' ? 'guest' : data as 'owner' | 'guest';
+      setRole(mappedRole);
     } catch (error) {
       console.error('Error fetching user role:', error);
       setRole(null);

@@ -3,7 +3,7 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useValidateToken, useSignupWithToken } from '@/hooks/useInvitations';
-import { reviewerSignupSchema, ReviewerSignupInput } from '@/lib/gallery-types';
+import { guestSignupSchema, GuestSignupInput } from '@/lib/gallery-types';
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -11,22 +11,22 @@ import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Loader2, AlertCircle } from 'lucide-react';
 
-const ReviewerSignup = () => {
+const GuestSignup = () => {
   const { token } = useParams<{ token: string }>();
   const navigate = useNavigate();
   const { data: tokenData, isLoading, error } = useValidateToken(token);
   const signupWithToken = useSignupWithToken();
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const form = useForm<ReviewerSignupInput>({
-    resolver: zodResolver(reviewerSignupSchema),
+  const form = useForm<GuestSignupInput>({
+    resolver: zodResolver(guestSignupSchema),
     defaultValues: {
       password: '',
       confirmPassword: '',
     },
   });
 
-  const onSubmit = async (data: ReviewerSignupInput) => {
+  const onSubmit = async (data: GuestSignupInput) => {
     if (!token || !tokenData) return;
 
     setIsSubmitting(true);
@@ -46,7 +46,7 @@ const ReviewerSignup = () => {
     <div className="flex min-h-screen items-center justify-center bg-background p-4">
       <Card className="w-full max-w-md">
         <CardHeader>
-          <CardTitle>Create Reviewer Account</CardTitle>
+          <CardTitle>Create Guest Account</CardTitle>
           <CardDescription>Complete your signup to access galleries</CardDescription>
         </CardHeader>
         <CardContent>
@@ -112,4 +112,4 @@ const ReviewerSignup = () => {
   );
 };
 
-export default ReviewerSignup;
+export default GuestSignup;

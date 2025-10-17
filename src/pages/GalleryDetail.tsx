@@ -35,7 +35,7 @@ const GalleryDetail = () => {
   const [breadcrumbPath, setBreadcrumbPath] = useState<Gallery[]>([]);
 
   const isOwner = role === 'owner';
-  const isReviewer = role === 'reviewer';
+  const isGuest = role === 'guest';
 
   // Build breadcrumb path
   useEffect(() => {
@@ -130,7 +130,7 @@ const GalleryDetail = () => {
               {subGalleries && subGalleries.length > 0 && (
                 <span>{subGalleries.length} sub-galler{subGalleries.length !== 1 ? 'ies' : 'y'}</span>
               )}
-              {isReviewer && galleryId && (
+              {isGuest && galleryId && (
                 <SelectionCounter galleryId={galleryId} />
               )}
             </div>

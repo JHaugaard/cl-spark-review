@@ -13,7 +13,7 @@ import ResetPassword from "./pages/ResetPassword";
 import UpdatePassword from "./pages/UpdatePassword";
 import Galleries from "./pages/Galleries";
 import GalleryDetail from "./pages/GalleryDetail";
-import ReviewerSignup from "./pages/ReviewerSignup";
+import GuestSignup from "./pages/GuestSignup";
 import CreateTestUser from "./pages/CreateTestUser";
 import MySelections from "./pages/MySelections";
 import NotFound from "./pages/NotFound";
@@ -21,9 +21,9 @@ import NotFound from "./pages/NotFound";
 // Lazy load dashboard pages (owner-only routes)
 const Dashboard = lazy(() => import("./pages/Dashboard"));
 const DashboardSelections = lazy(() => import("./pages/DashboardSelections"));
-const DashboardReviewers = lazy(() => import("./pages/DashboardReviewers"));
+const DashboardGuests = lazy(() => import("./pages/DashboardGuests"));
 const DashboardAnalytics = lazy(() => import("./pages/DashboardAnalytics"));
-const ReviewerDetail = lazy(() => import("./pages/ReviewerDetail"));
+const GuestDetail = lazy(() => import("./pages/GuestDetail"));
 
 const queryClient = new QueryClient();
 
@@ -40,8 +40,8 @@ const App = () => {
               <Route path="/login" element={<Login />} />
               <Route path="/reset-password" element={<ResetPassword />} />
               <Route path="/update-password" element={<UpdatePassword />} />
-              <Route path="/signup/:token" element={<ReviewerSignup />} />
-              <Route path="/invite/:token" element={<ReviewerSignup />} />
+              <Route path="/signup/:token" element={<GuestSignup />} />
+              <Route path="/invite/:token" element={<GuestSignup />} />
               <Route path="/create-test-user" element={<CreateTestUser />} />
               <Route
                 path="/dashboard"
@@ -64,21 +64,21 @@ const App = () => {
                 }
               />
               <Route
-                path="/dashboard/reviewers"
+                path="/dashboard/guests"
                 element={
                   <OwnerRoute>
                     <Suspense fallback={<div className="flex min-h-screen items-center justify-center">Loading...</div>}>
-                      <DashboardReviewers />
+                      <DashboardGuests />
                     </Suspense>
                   </OwnerRoute>
                 }
               />
               <Route
-                path="/dashboard/reviewers/:id"
+                path="/dashboard/guests/:id"
                 element={
                   <OwnerRoute>
                     <Suspense fallback={<div className="flex min-h-screen items-center justify-center">Loading...</div>}>
-                      <ReviewerDetail />
+                      <GuestDetail />
                     </Suspense>
                   </OwnerRoute>
                 }

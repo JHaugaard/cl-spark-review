@@ -1,13 +1,13 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
-import { Reviewer, GalleryAccess } from '@/lib/gallery-types';
+import { Guest, GalleryAccess } from '@/lib/gallery-types';
 import { toast } from 'sonner';
 
-export const useReviewers = () => {
+export const useGuests = () => {
   return useQuery({
-    queryKey: ['reviewers'],
+    queryKey: ['guests'],
     queryFn: async () => {
-      // First get reviewer user IDs
+      // First get reviewer user IDs (database still uses 'reviewer' role)
       const { data: roles, error: rolesError } = await supabase
         .from('user_roles')
         .select('user_id')
@@ -15,20 +15,20 @@ export const useReviewers = () => {
 
       if (rolesError) throw rolesError;
       
-      const reviewerIds = roles.map(r => r.user_id);
+      const guestIds = roles.map(r => r.user_id);
       
-      if (reviewerIds.length === 0) {
-        return [] as Reviewer[];
+      if (guestIds.length === 0) {
+        return [] as Guest[];
       }
 
       // Then get profiles for those users
       const { data, error } = await supabase
         .from('profiles')
         .select('id, email, full_name')
-        .in('id', reviewerIds);
+        .in('id', guestIds);
 
       if (error) throw error;
-      return data as Reviewer[];
+      return data as Guest[];
     },
   });
 };
@@ -57,11 +57,11 @@ export const useToggleGalleryAccess = () => {
   return useMutation({
     mutationFn: async ({
       galleryId,
-      reviewerId,
+      guestId,
       grant,
     }: {
       galleryId: string;
-      reviewerId: string;
+      guestId: string;
       grant: boolean;
     }) => {
       if (grant) {
@@ -70,7 +70,7 @@ export const useToggleGalleryAccess = () => {
           .from('gallery_access')
           .insert({
             gallery_id: galleryId,
-            reviewer_id: reviewerId,
+            reviewer_id: guestId,
           });
 
         if (error) throw error;
@@ -80,7 +80,7 @@ export const useToggleGalleryAccess = () => {
           .from('gallery_access')
           .delete()
           .eq('gallery_id', galleryId)
-          .eq('reviewer_id', reviewerId);
+          .eq('reviewer_id', guestId);
 
         if (error) throw error;
       }

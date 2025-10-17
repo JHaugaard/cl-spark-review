@@ -39,7 +39,7 @@ const Dashboard = () => {
       bgColor: 'bg-green-50 dark:bg-green-950',
     },
     {
-      title: 'Active Reviewers',
+      title: 'Active Guests',
       value: stats?.totalReviewers || 0,
       icon: Users,
       color: 'text-purple-600',
@@ -94,9 +94,9 @@ const Dashboard = () => {
             <FileText className="mr-2 h-4 w-4" />
             View All Selections
           </Button>
-          <Button variant="outline" onClick={() => navigate('/dashboard/reviewers')}>
+          <Button variant="outline" onClick={() => navigate('/dashboard/guests')}>
             <Users className="mr-2 h-4 w-4" />
-            Manage Reviewers
+            Manage Guests
           </Button>
           <Button variant="outline" onClick={() => navigate('/dashboard/analytics')}>
             <BarChart3 className="mr-2 h-4 w-4" />

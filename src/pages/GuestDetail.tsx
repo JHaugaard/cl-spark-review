@@ -11,21 +11,21 @@ import { format } from 'date-fns';
 import { ManageAccessDialog } from '@/components/access/ManageAccessDialog';
 import { useState } from 'react';
 
-const ReviewerDetail = () => {
+const GuestDetail = () => {
   const { id } = useParams();
   const navigate = useNavigate();
   const [manageAccessOpen, setManageAccessOpen] = useState(false);
   const [selectedGallery, setSelectedGallery] = useState<any>(null);
 
-  const { data: reviewer, isLoading } = useQuery({
-    queryKey: ['reviewer-detail', id],
+  const { data: guest, isLoading } = useQuery({
+    queryKey: ['guest-detail', id],
     queryFn: async () => {
-      if (!id) throw new Error('No reviewer ID');
+      if (!id) throw new Error('No guest ID');
 
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) throw new Error('Not authenticated');
 
-      // Get reviewer profile
+      // Get guest profile
       const { data: profile, error: profileError } = await supabase
         .from('profiles')
         .select('*')
@@ -101,11 +101,11 @@ const ReviewerDetail = () => {
     );
   }
 
-  if (!reviewer) {
+  if (!guest) {
     return (
       <Layout>
         <div className="container mx-auto max-w-7xl py-8">
-          <p>Reviewer not found</p>
+          <p>Guest not found</p>
         </div>
       </Layout>
     );
@@ -122,16 +122,16 @@ const ReviewerDetail = () => {
         {/* Header */}
         <Button 
           variant="ghost" 
-          onClick={() => navigate('/dashboard/reviewers')}
+          onClick={() => navigate('/dashboard/guests')}
           className="mb-6"
         >
           <ArrowLeft className="mr-2 h-4 w-4" />
-          Back to Reviewers
+          Back to Guests
         </Button>
 
         <div className="mb-8">
-          <h1 className="text-4xl font-bold">{reviewer.full_name || 'No name'}</h1>
-          <p className="mt-2 text-muted-foreground">{reviewer.email}</p>
+          <h1 className="text-4xl font-bold">{guest.full_name || 'No name'}</h1>
+          <p className="mt-2 text-muted-foreground">{guest.email}</p>
         </div>
 
         {/* Stats Cards */}
@@ -142,7 +142,7 @@ const ReviewerDetail = () => {
             </CardHeader>
             <CardContent>
               <p className="text-2xl font-bold">
-                {format(new Date(reviewer.created_at), 'MMM dd, yyyy')}
+                {format(new Date(guest.created_at), 'MMM dd, yyyy')}
               </p>
             </CardContent>
           </Card>
@@ -153,7 +153,7 @@ const ReviewerDetail = () => {
             </CardHeader>
             <CardContent>
               <p className="text-2xl font-bold">
-                {reviewer.galleries.filter((g: any) => g.hasAccess).length}
+                {guest.galleries.filter((g: any) => g.hasAccess).length}
               </p>
             </CardContent>
           </Card>
@@ -163,7 +163,7 @@ const ReviewerDetail = () => {
               <CardTitle className="text-sm text-muted-foreground">Total Selections</CardTitle>
             </CardHeader>
             <CardContent>
-              <p className="text-2xl font-bold">{reviewer.selectionCount}</p>
+              <p className="text-2xl font-bold">{guest.selectionCount}</p>
             </CardContent>
           </Card>
         </div>
@@ -173,17 +173,17 @@ const ReviewerDetail = () => {
           <CardHeader>
             <CardTitle>Gallery Access</CardTitle>
             <CardDescription>
-              Manage which galleries this reviewer can access
+              Manage which galleries this guest can access
             </CardDescription>
           </CardHeader>
           <CardContent>
-            {reviewer.galleries.length === 0 ? (
+            {guest.galleries.length === 0 ? (
               <p className="text-center py-8 text-muted-foreground">
                 No galleries available
               </p>
             ) : (
               <div className="space-y-3">
-                {reviewer.galleries.map((gallery: any) => (
+                {guest.galleries.map((gallery: any) => (
                   <div 
                     key={gallery.id}
                     className="flex items-center justify-between p-4 rounded-lg border hover:bg-muted/50 transition-colors"
@@ -228,4 +228,4 @@ const ReviewerDetail = () => {
   );
 };
 
-export default ReviewerDetail;
+export default GuestDetail;

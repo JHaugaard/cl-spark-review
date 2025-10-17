@@ -1,14 +1,14 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { InvitationToken } from '@/lib/supabase-types';
-import { InviteReviewerInput, ReviewerSignupInput } from '@/lib/gallery-types';
+import { InviteGuestInput, GuestSignupInput } from '@/lib/gallery-types';
 import { toast } from 'sonner';
 
 export const useCreateInvitation = () => {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: async (input: InviteReviewerInput) => {
+    mutationFn: async (input: InviteGuestInput) => {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) throw new Error('Not authenticated');
 
