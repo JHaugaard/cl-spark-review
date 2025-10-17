@@ -3,7 +3,7 @@ import { useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
 import { Button } from '@/components/ui/button';
 import { InviteReviewerDialog } from '@/components/invitation/InviteReviewerDialog';
-import { FolderOpen, UserPlus, Heart } from 'lucide-react';
+import { FolderOpen, UserPlus, Heart, LayoutDashboard } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 
 interface LayoutProps {
@@ -37,6 +37,17 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
             
             {user && (
               <nav className="flex items-center gap-2">
+                {role === 'owner' && (
+                  <Button
+                    variant={location.pathname.startsWith('/dashboard') ? 'default' : 'ghost'}
+                    size="sm"
+                    onClick={() => navigate('/dashboard')}
+                  >
+                    <LayoutDashboard className="mr-2 h-4 w-4" />
+                    Dashboard
+                  </Button>
+                )}
+                
                 <Button
                   variant={location.pathname.startsWith('/galleries') ? 'default' : 'ghost'}
                   size="sm"
