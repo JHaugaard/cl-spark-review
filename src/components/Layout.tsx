@@ -3,7 +3,7 @@ import { useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
 import { Button } from '@/components/ui/button';
 import { InviteReviewerDialog } from '@/components/invitation/InviteReviewerDialog';
-import { FolderOpen, UserPlus } from 'lucide-react';
+import { FolderOpen, UserPlus, Heart } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 
 interface LayoutProps {
@@ -45,6 +45,17 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
                   <FolderOpen className="mr-2 h-4 w-4" />
                   Galleries
                 </Button>
+                
+                {role === 'reviewer' && (
+                  <Button
+                    variant={location.pathname === '/selections' ? 'default' : 'ghost'}
+                    size="sm"
+                    onClick={() => navigate('/selections')}
+                  >
+                    <Heart className="mr-2 h-4 w-4" />
+                    My Selections
+                  </Button>
+                )}
               </nav>
             )}
           </div>

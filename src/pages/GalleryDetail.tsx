@@ -8,6 +8,7 @@ import { useSubGalleries } from '@/hooks/useSubGalleries';
 import { PhotoGrid } from '@/components/photo/PhotoGrid';
 import { PhotoUploadDialog } from '@/components/photo/PhotoUploadDialog';
 import { GalleryCard } from '@/components/gallery/GalleryCard';
+import { SelectionCounter } from '@/components/photo/SelectionCounter';
 import { Button } from '@/components/ui/button';
 import { ArrowLeft, Upload, Home } from 'lucide-react';
 import {
@@ -34,6 +35,7 @@ const GalleryDetail = () => {
   const [breadcrumbPath, setBreadcrumbPath] = useState<Gallery[]>([]);
 
   const isOwner = role === 'owner';
+  const isReviewer = role === 'reviewer';
 
   // Build breadcrumb path
   useEffect(() => {
@@ -127,6 +129,9 @@ const GalleryDetail = () => {
               <span>{photos?.length || 0} photo{photos?.length !== 1 ? 's' : ''}</span>
               {subGalleries && subGalleries.length > 0 && (
                 <span>{subGalleries.length} sub-galler{subGalleries.length !== 1 ? 'ies' : 'y'}</span>
+              )}
+              {isReviewer && galleryId && (
+                <SelectionCounter galleryId={galleryId} />
               )}
             </div>
           </div>

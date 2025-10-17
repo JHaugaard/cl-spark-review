@@ -75,5 +75,26 @@ export const reviewerSignupSchema = z.object({
 
 export type CreateGalleryInput = z.infer<typeof createGallerySchema>;
 export type EditGalleryInput = z.infer<typeof editGallerySchema>;
+
+// Photo selection types
+export interface PhotoSelection {
+  id: string;
+  photo_id: string;
+  reviewer_id: string;
+  selected_at: string;
+  notes: string | null;
+}
+
+export interface PhotoSelectionWithDetails extends PhotoSelection {
+  photos?: Photo & {
+    galleries?: Partial<Gallery>;
+  };
+}
+
+export const photoNotesSchema = z.object({
+  notes: z.string().max(500, 'Notes must be less than 500 characters').optional(),
+});
+
+export type PhotoNotesInput = z.infer<typeof photoNotesSchema>;
 export type InviteReviewerInput = z.infer<typeof inviteReviewerSchema>;
 export type ReviewerSignupInput = z.infer<typeof reviewerSignupSchema>;

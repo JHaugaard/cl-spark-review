@@ -128,6 +128,45 @@ export type Database = {
         }
         Relationships: []
       }
+      photo_selections: {
+        Row: {
+          id: string
+          notes: string | null
+          photo_id: string
+          reviewer_id: string
+          selected_at: string | null
+        }
+        Insert: {
+          id?: string
+          notes?: string | null
+          photo_id: string
+          reviewer_id: string
+          selected_at?: string | null
+        }
+        Update: {
+          id?: string
+          notes?: string | null
+          photo_id?: string
+          reviewer_id?: string
+          selected_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "photo_selections_photo_id_fkey"
+            columns: ["photo_id"]
+            isOneToOne: false
+            referencedRelation: "photos"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "photo_selections_reviewer_id_fkey"
+            columns: ["reviewer_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       photos: {
         Row: {
           filename: string

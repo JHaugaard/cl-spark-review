@@ -12,6 +12,7 @@ import UpdatePassword from "./pages/UpdatePassword";
 import Galleries from "./pages/Galleries";
 import GalleryDetail from "./pages/GalleryDetail";
 import ReviewerSignup from "./pages/ReviewerSignup";
+import MySelections from "./pages/MySelections";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -40,9 +41,17 @@ const App = () => (
             <Route
               path="/galleries/:galleryId"
               element={
-                <OwnerRoute>
+                <ProtectedRoute>
                   <GalleryDetail />
-                </OwnerRoute>
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/selections"
+              element={
+                <ProtectedRoute>
+                  <MySelections />
+                </ProtectedRoute>
               }
             />
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}

@@ -87,6 +87,7 @@ export const PhotoGrid = ({ photos, isLoading, onDelete }: PhotoGridProps) => {
         isOpen={lightboxOpen}
         onClose={() => setLightboxOpen(false)}
         onIndexChange={setCurrentPhotoIndex}
+        galleryId={photos[0]?.gallery_id}
       />
     </>
   );
