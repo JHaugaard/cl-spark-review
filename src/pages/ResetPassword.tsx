@@ -6,6 +6,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { useToast } from '@/hooks/use-toast';
+import logo from '@/assets/logo.png';
 
 const ResetPassword = () => {
   const { resetPassword } = useAuth();
@@ -51,8 +52,9 @@ const ResetPassword = () => {
     return (
       <div className="flex min-h-screen items-center justify-center bg-slate-50 px-4">
         <div className="w-full max-w-md space-y-8">
-          <div className="text-center">
-            <h1 className="text-3xl font-bold tracking-tight text-slate-900">PhotoReview</h1>
+          <div className="text-center space-y-4">
+            <img src={logo} alt="Collected Light" className="h-20 w-auto mx-auto" />
+            <h1 className="text-3xl font-bold tracking-tight text-slate-900">Collected Light Review</h1>
           </div>
 
           <Card className="border-slate-200 shadow-sm">
@@ -78,9 +80,12 @@ const ResetPassword = () => {
   return (
     <div className="flex min-h-screen items-center justify-center bg-slate-50 px-4">
       <div className="w-full max-w-md space-y-8">
-        <div className="text-center">
-          <h1 className="text-3xl font-bold tracking-tight text-slate-900">PhotoReview</h1>
-          <p className="mt-2 text-sm text-slate-600">Reset your password</p>
+        <div className="text-center space-y-4">
+          <img src={logo} alt="Collected Light" className="h-20 w-auto mx-auto" />
+          <div>
+            <h1 className="text-3xl font-bold tracking-tight text-slate-900">Collected Light Review</h1>
+            <p className="mt-2 text-sm text-slate-600">Reset your password</p>
+          </div>
         </div>
 
         <Card className="border-slate-200 shadow-sm">

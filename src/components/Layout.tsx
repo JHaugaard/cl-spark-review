@@ -5,6 +5,7 @@ import { Button } from '@/components/ui/button';
 import { InviteReviewerDialog } from '@/components/invitation/InviteReviewerDialog';
 import { FolderOpen, UserPlus, Heart, LayoutDashboard } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
+import logo from '@/assets/logo.png';
 
 interface LayoutProps {
   children: React.ReactNode;
@@ -28,12 +29,15 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
       <header className="border-b border-slate-200 bg-white">
         <div className="mx-auto flex max-w-7xl items-center justify-between px-4 py-4 sm:px-6 lg:px-8">
           <div className="flex items-center gap-6">
-            <h1 
-              className="cursor-pointer text-xl font-bold text-slate-900 hover:text-slate-700"
+            <div 
+              className="flex items-center gap-3 cursor-pointer hover:opacity-80 transition-opacity"
               onClick={() => navigate('/galleries')}
             >
-              PhotoReview
-            </h1>
+              <img src={logo} alt="Collected Light" className="h-10 w-auto" />
+              <h1 className="text-xl font-bold text-slate-900">
+                Collected Light Review
+              </h1>
+            </div>
             
             {user && (
               <nav className="flex items-center gap-2">
