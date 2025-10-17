@@ -1,6 +1,10 @@
-import { useNavigate } from 'react-router-dom';
+import { useState } from 'react';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
 import { Button } from '@/components/ui/button';
+import { InviteReviewerDialog } from '@/components/invitation/InviteReviewerDialog';
+import { FolderOpen, UserPlus } from 'lucide-react';
+import { Badge } from '@/components/ui/badge';
 
 interface LayoutProps {
   children: React.ReactNode;
@@ -8,29 +12,67 @@ interface LayoutProps {
 
 const Layout: React.FC<LayoutProps> = ({ children }) => {
   const navigate = useNavigate();
+  const location = useLocation();
   const { user, role, logout } = useAuth();
+  const [inviteDialogOpen, setInviteDialogOpen] = useState(false);
 
   const handleLogout = async () => {
     await logout();
     navigate('/login');
   };
 
+  const isOwner = role === 'owner';
+
   return (
     <div className="min-h-screen bg-slate-50">
       <header className="border-b border-slate-200 bg-white">
         <div className="mx-auto flex max-w-7xl items-center justify-between px-4 py-4 sm:px-6 lg:px-8">
-          <div className="flex items-center">
-            <h1 className="text-xl font-bold text-slate-900">PhotoReview</h1>
+          <div className="flex items-center gap-6">
+            <h1 
+              className="cursor-pointer text-xl font-bold text-slate-900 hover:text-slate-700"
+              onClick={() => navigate('/galleries')}
+            >
+              PhotoReview
+            </h1>
+            
+            {user && (
+              <nav className="flex items-center gap-2">
+                <Button
+                  variant={location.pathname.startsWith('/galleries') ? 'default' : 'ghost'}
+                  size="sm"
+                  onClick={() => navigate('/galleries')}
+                >
+                  <FolderOpen className="mr-2 h-4 w-4" />
+                  Galleries
+                </Button>
+              </nav>
+            )}
           </div>
 
           {user && (
             <div className="flex items-center gap-4">
+              {isOwner && (
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => setInviteDialogOpen(true)}
+                >
+                  <UserPlus className="mr-2 h-4 w-4" />
+                  Invite Reviewer
+                </Button>
+              )}
+              
               <div className="text-right">
-                <p className="text-sm font-medium text-slate-900">{user.email}</p>
-                {role && (
-                  <p className="text-xs text-slate-600 capitalize">{role}</p>
-                )}
+                <div className="flex items-center gap-2">
+                  <p className="text-sm font-medium text-slate-900">{user.email}</p>
+                  {role && (
+                    <Badge variant={isOwner ? 'default' : 'secondary'} className="text-xs">
+                      {role}
+                    </Badge>
+                  )}
+                </div>
               </div>
+              
               <Button
                 variant="outline"
                 size="sm"
@@ -45,6 +87,13 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
       </header>
 
       <main>{children}</main>
+      
+      {isOwner && (
+        <InviteReviewerDialog
+          open={inviteDialogOpen}
+          onOpenChange={setInviteDialogOpen}
+        />
+      )}
     </div>
   );
 };
